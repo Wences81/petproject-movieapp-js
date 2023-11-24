@@ -2,6 +2,10 @@ const API_KEY = "b935ea7a-9959-48d2-a25b-0a7d9fc1f4e4";
 const API_URL_POPULAR =
     "https://kinopoiskapiunofficial.tech/api/v2.2/films/top?type=TOP_100_POPULAR_FILMS&page=1";
 
+const API_URL_SEARCH =
+    "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword=";
+
+
 
 getMovies(API_URL_POPULAR);
 
@@ -16,8 +20,20 @@ async function getMovies(url) {
     showMovies(respData)
 }
 
+function getClassByRate(vote) {
+    if (vote >= 7) {
+        return 'green';
+    } else if (vote > 5) {
+        return 'orange';
+    } else {
+        return 'red'
+    }
+}
+
 function showMovies(data) {
     const moviesEl = document.querySelector('.movies');
+
+    document.querySelector('.movies').innerHTML = '';
 
     data.films.forEach(movie => {
         const movieEl = document.createElement('div')
@@ -36,9 +52,29 @@ function showMovies(data) {
                     <div class="movie__category">${movie.genres.map(
             (genre) => ` ${genre.genre}`
         )}</div>
-                    <div class="movie__average movie__average--green">10</div>
+        ${
+            movie.rating &&
+            `
+            <div class="movie__average movie__average--${getClassByRate(movie.rating)}">${movie.rating}</div>
+            `
+        }
                 </div>
         `;
         moviesEl.appendChild(movieEl);
     });
 }
+
+const form = document.querySelector('form');
+const search = document.querySelector('.header__search');
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const apiSearchUrl = `${API_URL_SEARCH}${search.value}`;
+    if (search.value) {
+        getMovies(apiSearchUrl);
+
+        search.value = '';
+    }
+
+});
