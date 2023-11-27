@@ -60,6 +60,7 @@ function showMovies(data) {
         }
                 </div>
         `;
+        movieEl.addEventListener('click', () => openModal(movie.filmId));
         moviesEl.appendChild(movieEl);
     });
 }
@@ -78,3 +79,50 @@ form.addEventListener('submit', (e) => {
     }
 
 });
+
+//modal
+
+const modalEl = document.querySelector('.modal');
+
+
+async function openModal(id) {
+    modalEl.classList.add('modal--show');
+
+
+    modalEl.innerHTML = `
+<div class='modal__card'>
+  <img class='modal__movie-backdrop' src='' alt=''>
+  <h2>
+   <span class='modal__movie-title'>Title</span>
+   <span class='modal__movie-release-year'>Year</span>
+  </h2>
+  <ul class='modal__movie-info'>
+    <div class='loader'></div>
+    <li class='modal__movie-genre'>Genre</li>
+    <li class='modal__movie-runtime'>Time</li>
+    <li >Site: <a class='modal__movie-site'></a></li>
+    <li class='modal__movie-overview'>Description</li>
+  </ul>
+  <button type='button' class='modal__button-close'>Close</button>
+</div>     
+
+`
+    const btnClose = document.querySelector('.modal__button-close');
+    btnClose.addEventListener('click', () => closeModal())
+}
+
+function closeModal() {
+    modalEl.classList.remove('modal--show');
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === modalEl) {
+        closeModal()
+    }
+})
+
+window.addEventListener('keydown', (e) => {
+    if (e.keyCode === 27) {
+        modalEl.classList.remove('modal--show')
+    }
+})
