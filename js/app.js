@@ -5,6 +5,8 @@ const API_URL_POPULAR =
 const API_URL_SEARCH =
     "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword=";
 
+const API_URL_MOVIE_DETAILS = "https://kinopoiskapiunofficial.tech/api/v2.2/films/"    
+
 
 
 getMovies(API_URL_POPULAR);
@@ -86,22 +88,32 @@ const modalEl = document.querySelector('.modal');
 
 
 async function openModal(id) {
+
+    const resp = await fetch(API_URL_MOVIE_DETAILS + id, {
+        headers: {
+            'X-API-KEY': API_KEY,
+            'Content-Type': 'application/json',
+        },
+    });
+    const respData = await resp.json();
+
     modalEl.classList.add('modal--show');
+    document.body.classList.add('stop-scrolling');
 
 
     modalEl.innerHTML = `
 <div class='modal__card'>
-  <img class='modal__movie-backdrop' src='' alt=''>
+  <img class='modal__movie-backdrop' src='${respData.posterUrl}' alt=''>
   <h2>
-   <span class='modal__movie-title'>Title</span>
-   <span class='modal__movie-release-year'>Year</span>
+   <span class='modal__movie-title'>${respData.nameRu}</span>
+   <span class='modal__movie-release-year'> - ${respData.year}</span>
   </h2>
   <ul class='modal__movie-info'>
     <div class='loader'></div>
-    <li class='modal__movie-genre'>Genre</li>
-    <li class='modal__movie-runtime'>Time</li>
-    <li >Site: <a class='modal__movie-site'></a></li>
-    <li class='modal__movie-overview'>Description</li>
+    <li class='modal__movie-genre'>Genre - ${respData.genres.map((el) => `<span>${el.genre}</span>`)}</li>
+    ${respData.filmLength ? `<li class='modal__movie-runtime'>Time - ${respData.filmLength} minute</li>` : ''}
+    <li >Site: <a class='modal__movie-site' href='${respData.webUrl}'>${respData.webUrl}</a></li>
+    <li class='modal__movie-overview'>Description - ${respData.description}</li>
   </ul>
   <button type='button' class='modal__button-close'>Close</button>
 </div>     
@@ -113,16 +125,17 @@ async function openModal(id) {
 
 function closeModal() {
     modalEl.classList.remove('modal--show');
+    document.body.classList.remove('stop-scrolling');
 }
 
 window.addEventListener('click', (e) => {
     if (e.target === modalEl) {
-        closeModal()
+        closeModal();
     }
 })
 
 window.addEventListener('keydown', (e) => {
     if (e.keyCode === 27) {
-        modalEl.classList.remove('modal--show')
+        closeModal();
     }
 })
